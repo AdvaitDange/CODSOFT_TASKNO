@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Task 1: Rule-Based Chatbot",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Task_1_Rule_Based_Chatbot/chatbot.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Run Task 2: Tic-Tac-Toe AI (GUI)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Task_2_Tic_Tac_Toe_AI/tictactoe_gui.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Run Task 3: Movie Recommendation System",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Task_3_Movie_Recommendation_System/recommender.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}
