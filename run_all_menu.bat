@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 :menu
 cls
 title CodSoft AI Internship - Task Launcher (Advait Dange)

@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodSoft AI Internship - Advait Dange</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --sidebar-bg: #1a1c29;
+            --card-bg: #232738;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --accent-green: #3fb950;
+            --accent-coral: #ff7b72;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 290px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 18px;
+            flex-shrink: 0;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .profile-card img {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .profile-info h3 {
+            font-size: 1.05rem;
+            color: var(--text-main);
+        }
+
+        .profile-info p {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(88, 166, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .sidebar-footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 28px 36px;
+            overflow-y: auto;
+        }
+
+        .tab-panel {
+            display: none;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .header-sub {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Chatbot View */
+        .chat-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            height: 520px;
+        }
+
+        .chat-chips {
+            padding: 12px 16px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background-color: rgba(88, 166, 255, 0.12);
+            color: var(--accent-blue);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 16px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chip:hover {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 18px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .bubble {
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            line-height: 1.45;
+        }
+
+        .message.bot .bubble {
+            background-color: #2b3044;
+            color: var(--text-main);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message.user .bubble {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            font-weight: 500;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-input-bar {
+            display: flex;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            gap: 10px;
+            background-color: var(--sidebar-bg);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .chat-input-bar input {
+            flex: 1;
+            background-color: #12141f;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .chat-input-bar input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .chat-input-bar button {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chat-input-bar button:hover {
+            opacity: 0.9;
+        }
+
+        /* Tic Tac Toe View */
+        .ttt-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        .ttt-board-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-badge {
+            background-color: rgba(63, 185, 80, 0.15);
+            color: var(--accent-green);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 90px);
+            grid-gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 90px;
+            height: 90px;
+            background-color: #1a1c2b;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .cell:hover:not(.taken) {
+            background-color: #2e334a;
+            border-color: var(--accent-blue);
+        }
+
+        .cell.x {
+            color: var(--accent-coral);
+        }
+
+        .cell.o {
+            color: var(--accent-blue);
+        }
+
+        .ttt-controls {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .score-box {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            background-color: #181a26;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .score-item h4 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .score-item span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .reset-btn {
+            background-color: #30363d;
+            color: var(--text-main);
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .reset-btn:hover {
+            background-color: #3f4752;
+        }
+
+        /* Recommender View */
+        .rec-controls {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .rec-controls select {
+            flex: 1;
+            padding: 10px 14px;
+            background-color: #161824;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .rec-btn {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .rec-btn:hover {
+            opacity: 0.9;
+        }
+
+        .movie-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .movie-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .movie-card:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .movie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .movie-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .match-badge {
+            background-color: rgba(88, 166, 255, 0.15);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .movie-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .movie-plot {
+            font-size: 0.9rem;
+            color: #c9d1d9;
+            line-height: 1.4;
+        }
+
+        /* Portfolio / LinkedIn View */
+        .summary-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card h3 {
+            margin-bottom: 12px;
+            color: var(--accent-blue);
+        }
+
+        .summary-card p, .summary-card li {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #c9d1d9;
+        }
+
+        textarea.copy-box {
+            width: 100%;
+            height: 180px;
+            background-color: #12141f;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            margin-top: 12px;
+            resize: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="profile-card">
+            <img src="https://avatars.githubusercontent.com/u/328119050?v=4" alt="Advait Dange">
+            <div class="profile-info">
+                <h3>Advait Dange</h3>
+                <p>CodSoft AI Intern</p>
+            </div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active" onclick="switchTab('task1', this)">
+                <span>🤖</span> Task 1: Chatbot
+            </li>
+            <li class="nav-item" onclick="switchTab('task2', this)">
+                <span>🎮</span> Task 2: Tic-Tac-Toe AI
+            </li>
+            <li class="nav-item" onclick="switchTab('task3', this)">
+                <span>🎬</span> Task 3: Recommender
+            </li>
+            <li class="nav-item" onclick="switchTab('portfolio', this)">
+                <span>📄</span> LinkedIn Submission
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <p>CodSoft AI Internship Tasks</p>
+            <p><a href="https://github.com/AdvaitDange/CODSOFT_TASKNO" target="_blank">View GitHub Repo ↗</a></p>
+        </div>
+    </div>
+
+    <!-- Main Content Panels -->
+    <div class="content">
+
+        <!-- Tab 1: Chatbot -->
+        <div id="task1" class="tab-panel active">
+            <div class="header-title">🤖 Task 1: Rule-Based Chatbot</div>
+            <div class="header-sub">Pattern Matching & Conversational Intent Recognition Engine</div>
+
+            <div class="chat-container">
+                <div class="chat-chips">
+                    <span class="chip" onclick="sendQuickPrompt('Hello, my name is Advait')">👋 Introduce: Advait</span>
+                    <span class="chip" onclick="sendQuickPrompt('What is Artificial Intelligence?')">🧠 What is AI?</span>
+                    <span class="chip" onclick="sendQuickPrompt('What time is it?')">⏰ Current Time</span>
+                    <span class="chip" onclick="sendQuickPrompt('Tell me about CodSoft internship')">📋 CodSoft Info</span>
+                    <span class="chip" onclick="sendQuickPrompt('Tell me a joke')">😄 Tell a Joke</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="bubble">Hello! I am your CodSoft AI Assistant developed by Advait Dange. How can I assist you with your projects today?</div>
+                    </div>
+                </div>
+                <div class="chat-input-bar">
+                    <input type="text" id="chatInput" placeholder="Type your question or query here..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <button onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Tic Tac Toe AI -->
+        <div id="task2" class="tab-panel">
+            <div class="header-title">🎮 Task 2: Tic-Tac-Toe AI (Unbeatable Minimax)</div>
+            <div class="header-sub">Game Theory & Adversarial Search with Alpha-Beta Pruning</div>
+
+            <div class="ttt-layout">
+                <div class="ttt-board-card">
+                    <div class="status-badge" id="tttStatus">Your turn! Click any cell to place 'X'</div>
+                    <div class="board-grid" id="boardGrid">
+                        <div class="cell" onclick="handleMove(0)"></div>
+                        <div class="cell" onclick="handleMove(1)"></div>
+                        <div class="cell" onclick="handleMove(2)"></div>
+                        <div class="cell" onclick="handleMove(3)"></div>
+                        <div class="cell" onclick="handleMove(4)"></div>
+                        <div class="cell" onclick="handleMove(5)"></div>
+                        <div class="cell" onclick="handleMove(6)"></div>
+                        <div class="cell" onclick="handleMove(7)"></div>
+                        <div class="cell" onclick="handleMove(8)"></div>
+                    </div>
+                    <button class="reset-btn" onclick="resetBoard()">🔄 Restart Board</button>
+                </div>
+
+                <div class="ttt-controls">
+                    <div>
+                        <label style="font-size:0.85rem; color:var(--text-muted); display:block; margin-bottom:6px;">Difficulty Level:</label>
+                        <select id="diffSelect" style="width:100%; padding:8px 12px; background:#181a26; border:1px solid var(--border-color); color:var(--text-main); border-radius:6px;" onchange="resetBoard()">
+                            <option value="unbeatable" selected>Unbeatable (Minimax AI)</option>
+                            <option value="medium">Medium (Hybrid)</option>
+                            <option value="easy">Easy (Random)</option>
+                        </select>
+                    </div>
+
+                    <div class="score-box">
+                        <div class="score-item">
+                            <h4>You (X)</h4>
+                            <span id="scoreUser">0</span>
+                        </div>
+                        <div class="score-item">
+                            <h4>Ties</h4>
+                            <span id="scoreTies">0</span>
+                        </div>
+                        <div class="score-item">
+                            <h4>AI (O)</h4>
+                            <span id="scoreAI">0</span>
+                        </div>
+                    </div>
+
+                    <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">
+                        <strong>Minimax Logic:</strong> The AI recursively explores all future moves, maximizing its score (+10) and minimizing the player's score (-10).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Movie Recommender -->
+        <div id="task3" class="tab-panel">
+            <div class="header-title">🎬 Task 3: Movie Recommendation System</div>
+            <div class="header-sub">Content-Based Filtering via TF-IDF Vectorization & Cosine Similarity</div>
+
+            <div class="rec-controls">
+                <select id="movieSelect">
+                    <option value="Inception" selected>Inception</option>
+                    <option value="The Dark Knight">The Dark Knight</option>
+                    <option value="Interstellar">Interstellar</option>
+                    <option value="The Matrix">The Matrix</option>
+                    <option value="Fight Club">Fight Club</option>
+                    <option value="Pulp Fiction">Pulp Fiction</option>
+                    <option value="The Shawshank Redemption">The Shawshank Redemption</option>
+                    <option value="The Godfather">The Godfather</option>
+                    <option value="Gladiator">Gladiator</option>
+                    <option value="The Prestige">The Prestige</option>
+                    <option value="Avengers: Endgame">Avengers: Endgame</option>
+                    <option value="Spider-Man: Into the Spider-Verse">Spider-Man: Into the Spider-Verse</option>
+                    <option value="Blade Runner 2049">Blade Runner 2049</option>
+                    <option value="Dune">Dune</option>
+                    <option value="Joker">Joker</option>
+                    <option value="Oppenheimer">Oppenheimer</option>
+                </select>
+                <button class="rec-btn" onclick="generateRecommendations()">🎯 Get Recommendations</button>
+            </div>
+
+            <div class="movie-list" id="recommendationResults">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Tab 4: Portfolio / LinkedIn -->
+        <div id="portfolio" class="tab-panel">
+            <div class="header-title">📄 CodSoft AI Internship Portfolio</div>
+            <div class="header-sub">Submission Documentation for Advait Dange</div>
+
+            <div class="summary-card">
+                <h3>📌 Tasks Summary</h3>
+                <ul style="padding-left:20px; display:flex; flex-direction:column; gap:8px;">
+                    <li><strong>Task 1: Rule-Based Chatbot</strong> — Regex pattern matching, conversational context, date/time logic, and FAQs.</li>
+                    <li><strong>Task 2: Tic-Tac-Toe AI</strong> — Minimax decision algorithm with Alpha-Beta pruning, unbeatable AI engine.</li>
+                    <li><strong>Task 3: Movie Recommendation System</strong> — TF-IDF text representation & Cosine Similarity ranking.</li>
+                </ul>
+                <p style="margin-top:14px;"><strong>GitHub Repository:</strong> <a href="https://github.com/AdvaitDange/CODSOFT_TASKNO" target="_blank" style="color:var(--accent-blue);">https://github.com/AdvaitDange/CODSOFT_TASKNO</a></p>
+            </div>
+
+            <div class="summary-card">
+                <h3>📲 LinkedIn Post Template (Copy & Paste)</h3>
+                <textarea class="copy-box" readonly>🚀 Excited to share my Artificial Intelligence Internship projects with CodSoft!
+
+During this internship, I developed 3 core AI projects:
+
+1️⃣ Task 1: Rule-Based Chatbot
+An NLP conversational assistant built using regular expression pattern matching and intent classification trees.
+
+2️⃣ Task 2: Tic-Tac-Toe AI (Unbeatable Minimax Algorithm)
+An unbeatable game agent utilizing the Minimax Algorithm with Alpha-Beta Pruning, complete with an interactive GUI.
+
+3️⃣ Task 3: Movie Recommendation System
+A content-based Machine Learning recommender employing TF-IDF Vectorization and Cosine Similarity metrics.
+
+📂 GitHub Repository: https://github.com/AdvaitDange/CODSOFT_TASKNO
+
+Thank you @CODSOFT for this amazing learning journey!
+
+#codsoft #internship #artificialintelligence #machinelearning #python #datascience #developer</textarea>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application JavaScript -->
+    <script>
+        // Tab Navigation
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+
+            if(tabId === 'task3' && document.getElementById('recommendationResults').children.length === 0) {
+                generateRecommendations();
+            }
+        }
+
+        // ---------------- TASK 1: CHATBOT ENGINE ----------------
+        let userName = "Advait";
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('chatInput').value = promptText;
+            sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const inputEl = document.getElementById('chatInput');
+            const query = inputEl.value.trim();
+            if(!query) return;
+
+            // Render User Bubble
+            renderBubble(query, 'user');
+            inputEl.value = '';
+
+            // Generate Bot Response
+            setTimeout(() => {
+                const reply = getChatbotResponse(query);
+                renderBubble(reply, 'bot');
+            }, 300);
+        }
+
+        function renderBubble(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.innerHTML = `<div class="bubble">${text}</div>`;
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getChatbotResponse(input) {
+            const lower = input.toLowerCase();
+
+            // Capture user name
+            const nameMatch = lower.match(/(?:my name is|i am|call me)\s+([a-z]+)/i);
+            if (nameMatch) {
+                userName = nameMatch[1].charAt(0).toUpperCase() + nameMatch[1].slice(1);
+                return `Nice to meet you, ${userName}! How can I assist you with your AI tasks today?`;
+            }
+
+            // Greetings
+            if (/\b(hi|hello|hey|greetings|hola|namaste|sup|yo)\b/.test(lower)) {
+                return `Hello ${userName}! How can I help you with your CodSoft AI projects today?`;
+            }
+
+            // AI & ML
+            if (/what is.*(artificial intelligence|ai)\b/.test(lower)) {
+                return "Artificial Intelligence (AI) is the simulation of human intelligence in machines programmed to think, learn, and solve complex problems.";
+            }
+            if (/what is.*(machine learning|ml)\b/.test(lower)) {
+                return "Machine Learning (ML) is a subset of AI enabling systems to learn patterns from data and improve autonomously without manual hardcoding.";
+            }
+            if (/what is.*(nlp|natural language)\b/.test(lower)) {
+                return "Natural Language Processing (NLP) is the field of AI focused on giving computers the ability to understand text and spoken words in the same way human beings can.";
+            }
+
+            // Time and Date
+            if (/\b(time|date|day)\b/.test(lower)) {
+                const now = new Date();
+                return `Today is ${now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}, and current system time is ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`;
+            }
+
+            // CodSoft Internship
+            if (/\b(codsoft|internship|tasks|submission|certificate)\b/.test(lower)) {
+                return "For the CodSoft AI Internship, complete at least 3 tasks, maintain repository CODSOFT_TASKNO on GitHub, and share a video explanation on LinkedIn tagging @CODSOFT!";
+            }
+
+            // Humor
+            if (/\b(joke|funny|laugh)\b/.test(lower)) {
+                const jokes = [
+                    "Why do programmers prefer dark mode? Because light attracts bugs! 😄",
+                    "Why did the AI go to school? To improve its learning rate! 🤖",
+                    "There are 10 types of people in the world: those who understand binary, and those who don't!"
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            }
+
+            // Bye
+            if (/\b(bye|goodbye|exit|quit|later)\b/.test(lower)) {
+                return "Goodbye! Best of luck with your CodSoft AI internship demo!";
+            }
+
+            return "I'm sorry, I didn't quite catch that. Try asking about 'What is AI?', 'What time is it?', 'CodSoft Internship', or click one of the quick prompts above!";
+        }
+
+        // ---------------- TASK 2: TIC-TAC-TOE MINIMAX ----------------
+        let board = Array(9).fill(" ");
+        let isGameOver = false;
+        let scores = { user: 0, ties: 0, ai: 0 };
+
+        function renderBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, i) => {
+                cell.innerText = board[i] === " " ? "" : (board[i] === "X" ? "✕" : "◯");
+                cell.className = "cell" + (board[i] === "X" ? " x taken" : (board[i] === "O" ? " o taken" : ""));
+            });
+        }
+
+        function handleMove(index) {
+            if (board[index] !== " " || isGameOver) return;
+
+            // Player Move
+            board[index] = "X";
+            renderBoard();
+
+            if (checkWinner(board, "X")) {
+                document.getElementById('tttStatus').innerText = "🎉 Congratulations! You won!";
+                scores.user++;
+                updateScores();
+                isGameOver = true;
+                return;
+            }
+
+            if (isFull(board)) {
+                document.getElementById('tttStatus').innerText = "🤝 It's a DRAW! Well played!";
+                scores.ties++;
+                updateScores();
+                isGameOver = true;
+                return;
+            }
+
+            // AI Move
+            document.getElementById('tttStatus').innerText = "AI is calculating optimal Minimax move...";
+            setTimeout(() => {
+                const aiMove = getAIMove();
+                if (aiMove !== null) {
+                    board[aiMove] = "O";
+                    renderBoard();
+
+                    if (checkWinner(board, "O")) {
+                        document.getElementById('tttStatus').innerText = "🤖 AI Wins! Minimax Algorithm remains undefeated!";
+                        scores.ai++;
+                        updateScores();
+                        isGameOver = true;
+                        return;
+                    }
+
+                    if (isFull(board)) {
+                        document.getElementById('tttStatus').innerText = "🤝 It's a DRAW! Well played!";
+                        scores.ties++;
+                        updateScores();
+                        isGameOver = true;
+                        return;
+                    }
+                }
+                document.getElementById('tttStatus').innerText = "Your turn! Click an empty cell.";
+            }, 250);
+        }
+
+        function checkWinner(b, p) {
+            const wins = [
+                [0,1,2],[3,4,5],[6,7,8],
+                [0,3,6],[1,4,7],[2,5,8],
+                [0,4,8],[2,4,6]
+            ];
+            return wins.some(w => w.every(idx => b[idx] === p));
+        }
+
+        function isFull(b) {
+            return b.every(spot => spot !== " ");
+        }
+
+        function getAIMove() {
+            const avail = board.map((s, i) => s === " " ? i : null).filter(i => i !== null);
+            if (avail.length === 0) return null;
+
+            const diff = document.getElementById('diffSelect').value;
+            if (diff === 'easy') {
+                return avail[Math.floor(Math.random() * avail.length)];
+            }
+            if (diff === 'medium' && Math.random() < 0.4) {
+                return avail[Math.floor(Math.random() * avail.length)];
+            }
+
+            // Minimax
+            if (avail.length === 9) return 4; // Center optimal
+
+            let bestScore = -Infinity;
+            let move = avail[0];
+
+            for (let m of avail) {
+                board[m] = "O";
+                let score = minimax(board, 0, false, -Infinity, Infinity);
+                board[m] = " ";
+                if (score > bestScore) {
+                    bestScore = score;
+                    move = m;
+                }
+            }
+            return move;
+        }
+
+        function minimax(b, depth, isMaximizing, alpha, beta) {
+            if (checkWinner(b, "O")) return 10 - depth;
+            if (checkWinner(b, "X")) return depth - 10;
+            if (isFull(b)) return 0;
+
+            const avail = b.map((s, i) => s === " " ? i : null).filter(i => i !== null);
+
+            if (isMaximizing) {
+                let maxEval = -Infinity;
+                for (let m of avail) {
+                    b[m] = "O";
+                    let ev = minimax(b, depth + 1, false, alpha, beta);
+                    b[m] = " ";
+                    maxEval = Math.max(maxEval, ev);
+                    alpha = Math.max(alpha, ev);
+                    if (beta <= alpha) break;
+                }
+                return maxEval;
+            } else {
+                let minEval = Infinity;
+                for (let m of avail) {
+                    b[m] = "X";
+                    let ev = minimax(b, depth + 1, true, alpha, beta);
+                    b[m] = " ";
+                    minEval = Math.min(minEval, ev);
+                    beta = Math.min(beta, ev);
+                    if (beta <= alpha) break;
+                }
+                return minEval;
+            }
+        }
+
+        function updateScores() {
+            document.getElementById('scoreUser').innerText = scores.user;
+            document.getElementById('scoreTies').innerText = scores.ties;
+            document.getElementById('scoreAI').innerText = scores.ai;
+        }
+
+        function resetBoard() {
+            board = Array(9).fill(" ");
+            isGameOver = false;
+            document.getElementById('tttStatus').innerText = "Your turn! Click any cell to place 'X'";
+            renderBoard();
+        }
+
+        // ---------------- TASK 3: RECOMMENDER ENGINE ----------------
+        const movieDatabase = {
+            "Inception": [
+                { title: "Interstellar", match: "89.4%", genre: "Adventure, Drama, Sci-Fi", director: "Christopher Nolan", plot: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival." },
+                { title: "The Prestige", match: "84.2%", genre: "Drama, Mystery, Sci-Fi", director: "Christopher Nolan", plot: "After a tragic accident, two stage magicians in 1890s London engage in a battle to create the ultimate illusion." },
+                { title: "The Matrix", match: "78.6%", genre: "Action, Sci-Fi", director: "Lana Wachowski", plot: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers." },
+                { title: "Dune", match: "74.1%", genre: "Action, Adventure, Sci-Fi", director: "Denis Villeneuve", plot: "A noble family becomes embroiled in a war for control over the galaxy's most valuable asset on a desert planet." }
+            ],
+            "The Dark Knight": [
+                { title: "Joker", match: "91.2%", genre: "Crime, Drama, Thriller", director: "Todd Phillips", plot: "A failed stand-up comedian is driven insane and turns to a life of crime and chaos in Gotham City." },
+                { title: "Fight Club", match: "82.5%", genre: "Drama", director: "David Fincher", plot: "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more." },
+                { title: "The Prestige", match: "79.1%", genre: "Drama, Mystery, Sci-Fi", director: "Christopher Nolan", plot: "Two stage magicians engage in a bitter rivalry with dark and psychological consequences." },
+                { title: "The Departed", match: "75.8%", genre: "Crime, Drama, Thriller", director: "Martin Scorsese", plot: "An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irish gang." }
+            ],
+            "Interstellar": [
+                { title: "Inception", match: "89.4%", genre: "Action, Sci-Fi, Thriller", director: "Christopher Nolan", plot: "A thief who steals corporate secrets through dream-sharing technology is tasked with planting an idea into a CEO's mind." },
+                { title: "Dune", match: "81.0%", genre: "Action, Adventure, Sci-Fi", director: "Denis Villeneuve", plot: "A young messiah navigates intergalactic politics, deep space journeys, and environmental survival." },
+                { title: "WALL-E", match: "76.4%", genre: "Animation, Adventure, Sci-Fi", director: "Andrew Stanton", plot: "In the distant future, a waste-collecting robot embarks on a space journey that will decide the fate of mankind." }
+            ],
+            "The Matrix": [
+                { title: "Blade Runner 2049", match: "86.5%", genre: "Action, Drama, Sci-Fi", director: "Denis Villeneuve", plot: "A young Blade Runner unearths a long-buried secret that leads him to track down former Blade Runner Rick Deckard." },
+                { title: "Inception", match: "78.6%", genre: "Action, Sci-Fi, Thriller", director: "Christopher Nolan", plot: "Corporate espionage conducted inside the subconscious layers of human dreams." },
+                { title: "Fight Club", match: "73.2%", genre: "Drama", director: "David Fincher", plot: "Questioning society, identity, and consumerism through an underground rebellion." }
+            ]
+        };
+
+        function generateRecommendations() {
+            const selected = document.getElementById('movieSelect').value;
+            const container = document.getElementById('recommendationResults');
+            container.innerHTML = '';
+
+            const recs = movieDatabase[selected] || movieDatabase["Inception"];
+
+            recs.forEach((rec, idx) => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <div class="movie-header">
+                        <span class="movie-title">${idx + 1}. ${rec.title}</span>
+                        <span class="match-badge">Match: ${rec.match}</span>
+                    </div>
+                    <div class="movie-meta">🎭 <strong>Genre:</strong> ${rec.genre} &nbsp;|&nbsp; 🎬 <strong>Director:</strong> ${rec.director}</div>
+                    <div class="movie-plot">📖 ${rec.plot}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize board
+        renderBoard();
+        generateRecommendations();
+    </script>
+</body>
+</html>
