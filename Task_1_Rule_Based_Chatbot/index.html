@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 1: Rule-Based Chatbot - Advait Dange</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --card-bg: #1a1c29;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-coral: #ff7b72;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-app {
+            width: 100%;
+            max-width: 820px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            height: 88vh;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 18px 24px;
+            background-color: #161824;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h1 {
+            font-size: 1.35rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .chat-header .meta a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .quick-chips {
+            padding: 10px 18px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background-color: rgba(88, 166, 255, 0.12);
+            color: var(--accent-blue);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 16px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip:hover {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 82%;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .message.bot .avatar {
+            background-color: #2b3044;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .message.user .avatar {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+        }
+
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message.bot .bubble {
+            background-color: #232738;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message.user .bubble {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            font-weight: 500;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-input-area {
+            padding: 14px 20px;
+            background-color: #161824;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: #0f111a;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .chat-input-area input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .chat-input-area button {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chat-input-area button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-app">
+        <!-- Header -->
+        <div class="chat-header">
+            <div>
+                <h1>🤖 Rule-Based Chatbot</h1>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">CodSoft AI Internship - Task 1 | NLP Pattern Matching</p>
+            </div>
+            <div class="meta">
+                <p><strong>Advait Dange</strong></p>
+                <p><a href="https://github.com/AdvaitDange/CODSOFT_TASKNO" target="_blank">GitHub Repository ↗</a></p>
+            </div>
+        </div>
+
+        <!-- Quick Prompts -->
+        <div class="quick-chips">
+            <span class="chip" onclick="sendPrompt('Hello, my name is Advait')">👋 Introduce: Advait</span>
+            <span class="chip" onclick="sendPrompt('What is Artificial Intelligence?')">🧠 What is AI?</span>
+            <span class="chip" onclick="sendPrompt('What time is it?')">⏰ Current Time</span>
+            <span class="chip" onclick="sendPrompt('Tell me about CodSoft internship')">📋 CodSoft Info</span>
+            <span class="chip" onclick="sendPrompt('Tell me a joke')">😄 Tell a Joke</span>
+        </div>
+
+        <!-- Chat messages area -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="avatar">🤖</div>
+                <div class="bubble">Hello! I am your CodSoft AI Assistant developed by Advait Dange. How can I assist you with your projects today?</div>
+            </div>
+        </div>
+
+        <!-- Input box -->
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Type a message or click a prompt above..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let userName = "Advait";
+
+        function sendPrompt(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const inputEl = document.getElementById('userInput');
+            const query = inputEl.value.trim();
+            if (!query) return;
+
+            addBubble(query, 'user');
+            inputEl.value = '';
+
+            setTimeout(() => {
+                const botReply = evaluateQuery(query);
+                addBubble(botReply, 'bot');
+            }, 300);
+        }
+
+        function addBubble(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            const avatar = sender === 'bot' ? '🤖' : '👤';
+            msgDiv.innerHTML = `
+                <div class="avatar">${avatar}</div>
+                <div class="bubble">${text}</div>
+            `;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function evaluateQuery(input) {
+            const q = input.toLowerCase();
+
+            // Name capture
+            const nameMatch = q.match(/(?:my name is|i am|call me)\s+([a-z]+)/i);
+            if (nameMatch) {
+                userName = nameMatch[1].charAt(0).toUpperCase() + nameMatch[1].slice(1);
+                return `Nice to meet you, ${userName}! How can I assist you with your AI tasks today?`;
+            }
+
+            // Greetings
+            if (/\b(hi|hello|hey|greetings|hola|namaste|yo|sup)\b/.test(q)) {
+                return `Hello ${userName}! How can I help you with your CodSoft AI projects today?`;
+            }
+
+            // AI concepts
+            if (/what is.*(artificial intelligence|ai)\b/.test(q)) {
+                return "Artificial Intelligence (AI) is the simulation of human intelligence in machines programmed to think, learn, and solve complex problems.";
+            }
+            if (/what is.*(machine learning|ml)\b/.test(q)) {
+                return "Machine Learning (ML) is a subset of AI that allows software applications to learn from data patterns without being explicitly programmed.";
+            }
+            if (/what is.*(nlp|natural language)\b/.test(q)) {
+                return "Natural Language Processing (NLP) is the field of AI focused on enabling computers to understand, interpret, and generate human language.";
+            }
+            if (/what is.*(deep learning|neural network)\b/.test(q)) {
+                return "Deep Learning uses multi-layered neural networks inspired by biological neurons to process images, speech, and vast datasets.";
+            }
+
+            // Time and Date
+            if (/\b(time|date|day|clock)\b/.test(q)) {
+                const now = new Date();
+                return `Today is ${now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}, and the system time is ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`;
+            }
+
+            // CodSoft Internship FAQs
+            if (/\b(codsoft|internship|tasks|submission|certificate)\b/.test(q)) {
+                return "For the CodSoft AI Internship, complete at least 3 tasks, maintain repository CODSOFT_TASKNO on GitHub, and share a video explanation on LinkedIn tagging @CODSOFT!";
+            }
+
+            // Humor
+            if (/\b(joke|funny|laugh)\b/.test(q)) {
+                const jokes = [
+                    "Why do programmers prefer dark mode? Because light attracts bugs! 😄",
+                    "Why did the AI go to school? To improve its learning rate! 🤖",
+                    "There are 10 types of people in the world: those who understand binary, and those who don't!"
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            }
+
+            // Exit
+            if (/\b(bye|goodbye|exit|quit|later)\b/.test(q)) {
+                return "Goodbye! Best of luck with your CodSoft AI internship demo!";
+            }
+
+            return "I'm sorry, I didn't quite catch that. Try asking about 'What is AI?', 'What time is it?', 'CodSoft Internship', or click one of the quick prompts above!";
+        }
+    </script>
+</body>
+</html>

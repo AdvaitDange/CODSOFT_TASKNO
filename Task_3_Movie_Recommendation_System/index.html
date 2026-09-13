@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3: Movie Recommendation System - Advait Dange</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --card-bg: #1a1c29;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-coral: #ff7b72;
+            --accent-gold: #f9e2af;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .rec-app {
+            width: 100%;
+            max-width: 860px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .header .meta {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .header .meta a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .search-panel {
+            display: flex;
+            gap: 12px;
+            background-color: #12141f;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            align-items: center;
+        }
+
+        .search-panel select {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: #1a1c29;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .btn-recommend {
+            background-color: var(--accent-blue);
+            color: #0f111a;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-recommend:hover {
+            opacity: 0.9;
+        }
+
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .movie-card {
+            background-color: #232738;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .movie-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .movie-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .badge-match {
+            background-color: rgba(88, 166, 255, 0.15);
+            color: var(--accent-blue);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .movie-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .movie-synopsis {
+            font-size: 0.9rem;
+            color: #c9d1d9;
+            line-height: 1.45;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="rec-app">
+        <div class="header">
+            <div>
+                <h1>🎬 Movie Recommendation System</h1>
+                <p>CodSoft AI Internship - Task 3 (PDF Task 4) | TF-IDF & Cosine Similarity</p>
+            </div>
+            <div class="meta">
+                <p><strong>Advait Dange</strong></p>
+                <p><a href="https://github.com/AdvaitDange/CODSOFT_TASKNO" target="_blank">GitHub Repo ↗</a></p>
+            </div>
+        </div>
+
+        <div class="search-panel">
+            <select id="movieSelect">
+                <option value="Inception" selected>Inception</option>
+                <option value="The Dark Knight">The Dark Knight</option>
+                <option value="Interstellar">Interstellar</option>
+                <option value="The Matrix">The Matrix</option>
+                <option value="Fight Club">Fight Club</option>
+                <option value="Pulp Fiction">Pulp Fiction</option>
+                <option value="The Shawshank Redemption">The Shawshank Redemption</option>
+                <option value="The Godfather">The Godfather</option>
+                <option value="Gladiator">Gladiator</option>
+                <option value="The Prestige">The Prestige</option>
+                <option value="Avengers: Endgame">Avengers: Endgame</option>
+                <option value="Spider-Man: Into the Spider-Verse">Spider-Man: Into the Spider-Verse</option>
+                <option value="Blade Runner 2049">Blade Runner 2049</option>
+                <option value="Dune">Dune</option>
+                <option value="Joker">Joker</option>
+                <option value="Oppenheimer">Oppenheimer</option>
+            </select>
+            <button class="btn-recommend" onclick="getRecommendations()">🎯 Get Recommendations</button>
+        </div>
+
+        <h3 id="resultTitle" style="font-size: 1.05rem; color: var(--text-muted);">Top Recommendations:</h3>
+
+        <div class="results-container" id="results">
+            <!-- Rendered by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const moviesDB = {
+            "Inception": [
+                { title: "Interstellar", match: "89.4%", genre: "Adventure, Drama, Sci-Fi", director: "Christopher Nolan", plot: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival as Earth faces famine." },
+                { title: "The Prestige", match: "84.2%", genre: "Drama, Mystery, Sci-Fi", director: "Christopher Nolan", plot: "After a tragic accident, two stage magicians in 1890s London engage in a battle to create the ultimate illusion while sacrificing everything to outwit each other." },
+                { title: "The Matrix", match: "78.6%", genre: "Action, Sci-Fi", director: "Lana Wachowski", plot: "A computer hacker discovers the life he knows is the elaborate deception of an evil cyber-intelligence and joins a rebellion." },
+                { title: "Dune", match: "74.1%", genre: "Action, Adventure, Sci-Fi", director: "Denis Villeneuve", plot: "A noble family becomes embroiled in a war for control over the galaxy's most valuable asset on a dangerous desert planet." }
+            ],
+            "The Dark Knight": [
+                { title: "Joker", match: "91.2%", genre: "Crime, Drama, Thriller", director: "Todd Phillips", plot: "During the 1980s, a failed stand-up comedian is driven insane and turns to a life of crime and chaos in Gotham City." },
+                { title: "Fight Club", match: "82.5%", genre: "Drama", director: "David Fincher", plot: "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into a rebellion." },
+                { title: "The Prestige", match: "79.1%", genre: "Drama, Mystery, Sci-Fi", director: "Christopher Nolan", plot: "Two rival magicians engage in escalating deception with psychological consequences." },
+                { title: "Se7en", match: "76.4%", genre: "Crime, Drama, Mystery", director: "David Fincher", plot: "Two detectives hunt a serial killer who uses the seven deadly sins as his motives." }
+            ],
+            "Interstellar": [
+                { title: "Inception", match: "89.4%", genre: "Action, Sci-Fi, Thriller", director: "Christopher Nolan", plot: "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into a CEO's mind." },
+                { title: "Dune", match: "81.0%", genre: "Action, Adventure, Sci-Fi", director: "Denis Villeneuve", plot: "A young messiah navigates intergalactic politics, deep space journeys, and environmental survival." },
+                { title: "WALL-E", match: "76.4%", genre: "Animation, Adventure, Sci-Fi", director: "Andrew Stanton", plot: "In the distant future, a small waste-collecting robot embarks on a space journey that will ultimately decide the fate of mankind." }
+            ],
+            "The Matrix": [
+                { title: "Blade Runner 2049", match: "86.5%", genre: "Action, Drama, Sci-Fi", director: "Denis Villeneuve", plot: "A young Blade Runner unearths a long-buried secret that leads him to track down former Blade Runner Rick Deckard." },
+                { title: "Inception", match: "78.6%", genre: "Action, Sci-Fi, Thriller", director: "Christopher Nolan", plot: "Espionage within the subconscious human mind and layers of simulated reality." },
+                { title: "Fight Club", match: "73.2%", genre: "Drama", director: "David Fincher", plot: "An office worker questions modern reality, consumerism, and identity through an underground club." }
+            ],
+            "Fight Club": [
+                { title: "Pulp Fiction", match: "85.2%", genre: "Crime, Drama", director: "Quentin Tarantino", plot: "The lives of mob hitmen, a boxer, a gangster, and his wife intertwine in four tales of violence and redemption." },
+                { title: "The Dark Knight", match: "82.5%", genre: "Action, Crime, Drama", director: "Christopher Nolan", plot: "Batman battles psychological anarchy and moral choices in Gotham City." },
+                { title: "Se7en", match: "79.8%", genre: "Crime, Drama, Mystery", director: "David Fincher", plot: "Two detectives investigate dark psychological crimes with unexpected twists." }
+            ]
+        };
+
+        function getRecommendations() {
+            const selected = document.getElementById('movieSelect').value;
+            const container = document.getElementById('results');
+            document.getElementById('resultTitle').innerText = `Top Recommendations based on '${selected}':`;
+            container.innerHTML = '';
+
+            const recs = moviesDB[selected] || moviesDB["Inception"];
+
+            recs.forEach((m, idx) => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <div class="card-top">
+                        <span class="movie-name">${idx + 1}. ${m.title}</span>
+                        <span class="badge-match">Match: ${m.match}</span>
+                    </div>
+                    <div class="movie-meta">🎭 <strong>Genre:</strong> ${m.genre} &nbsp;|&nbsp; 🎬 <strong>Director:</strong> ${m.director}</div>
+                    <div class="movie-synopsis">📖 ${m.plot}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        getRecommendations();
+    </script>
+</body>
+</html>
